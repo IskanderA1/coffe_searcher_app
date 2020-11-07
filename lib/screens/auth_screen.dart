@@ -1,4 +1,4 @@
-import 'package:coffe_searcher_app/bloc/is_auth_bloc.dart';
+import 'package:coffe_searcher_app/bloc/auth_user_bloc.dart';
 import 'package:coffe_searcher_app/style/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,9 +14,19 @@ class _AuthScreenState extends State<AuthScreen> {
   final loginController = TextEditingController();
   final passController = TextEditingController();
 
-  bool _rememberMe = false;
 
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    loginController.clear();
+    passController.clear();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +103,7 @@ class _AuthScreenState extends State<AuthScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: loginController,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Style.standardTextColor,
@@ -128,6 +139,7 @@ class _AuthScreenState extends State<AuthScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: passController,
             obscureText: true,
             style: TextStyle(
               color: Style.standardTextColor,
@@ -171,7 +183,8 @@ class _AuthScreenState extends State<AuthScreen> {
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () {
-          getAuthStateBloc.pickItem(1);
+          authBloc..auth("0102", "323da");
+          authBloc..auth(loginController.text, passController.text);
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(

@@ -1,5 +1,6 @@
+
 import 'package:coffe_searcher_app/bloc/events_bloc.dart';
-import 'package:coffe_searcher_app/model/event_model.dart';
+
 import 'package:coffe_searcher_app/screens/tabs/events/event_item.dart';
 import 'package:coffe_searcher_app/screens/tabs/events/events_list_screen.dart';
 import 'package:coffe_searcher_app/style/style.dart';
@@ -11,6 +12,12 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

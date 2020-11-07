@@ -1,6 +1,11 @@
+import 'package:coffe_searcher_app/bloc/auth_user_bloc.dart';
 import 'package:coffe_searcher_app/bloc/events_bloc.dart';
+import 'package:coffe_searcher_app/bloc/get_events_bloc.dart';
+import 'package:coffe_searcher_app/elements/loader.dart';
 import 'package:coffe_searcher_app/model/event_model.dart';
+import 'package:coffe_searcher_app/model/events_response.dart';
 import 'package:coffe_searcher_app/style/style.dart';
+import 'package:coffe_searcher_app/widgets/add_event_widget.dart';
 import 'package:flutter/material.dart';
 
 class EventsListScreen extends StatefulWidget {
@@ -9,6 +14,12 @@ class EventsListScreen extends StatefulWidget {
 }
 
 class _EventsListScreenState extends State<EventsListScreen> {
+  @override
+  void initState() {
+    getEventsBloc.getEvents(authBloc.subject.value.user.token);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +38,9 @@ class _EventsListScreenState extends State<EventsListScreen> {
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          addEventWidget(context);
+        },
         backgroundColor: Style.titleColor,
         label: Text(
           "add event",
@@ -49,11 +62,24 @@ class _EventsListScreenState extends State<EventsListScreen> {
   }
 
   Widget _buildEventsList() {
-    List<EventModel> events = [EventModel(), EventModel(), EventModel()];
-    return ListView.builder(
-        itemCount: events.length,
-        itemBuilder: (context, index) {
-          return _buildEventItem(events[index]);
+    return StreamBuilder(
+        stream: getEventsBloc.subject,
+        builder: (context, AsyncSnapshot<EventsResponse> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data.error != null && snapshot.data.error.length > 0) {
+              return Container();
+            }
+            return ListView.builder(
+                itemCount: snapshot.data.events.length,
+                itemBuilder: (context, index) {
+                  return _buildEventItem(snapshot.data.events[index]);
+                });
+          } else if (snapshot.hasError) {
+            print("hasError");
+            return Container();
+          } else {
+            return buildLoadingWidget();
+          }
         });
   }
 
@@ -72,7 +98,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    "12:30",
+              "${DateTime.parse(eventModel.date).hour}:${DateTime.parse(eventModel.date).minute}",
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       fontSize: 30,
@@ -84,7 +110,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     height: 4,
                   ),
                   Text(
-                    "08:11:2020",
+                    "${DateTime.parse(eventModel.date).day}.${DateTime.parse(eventModel.date).month}.${DateTime.parse(eventModel.date).year}",
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       fontSize: 14,
@@ -109,7 +135,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Bob's Happy Birthday",
+                        eventModel.title,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           fontSize: 20,
@@ -121,7 +147,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                         height: 4,
                       ),
                       Text(
-                        "pole1",
+                        eventModel.owner,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           fontSize: 14,
@@ -148,7 +174,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                   child: RotatedBox(
                     quarterTurns: -1,
                     child: GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         getEventsState.pickItem(1);
                       },
                       child: Container(

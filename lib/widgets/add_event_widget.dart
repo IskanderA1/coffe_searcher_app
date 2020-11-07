@@ -1,4 +1,4 @@
-import 'package:coffe_searcher_app/model/event_model.dart';
+
 import 'package:coffe_searcher_app/style/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +69,42 @@ void addEventWidget(BuildContext context) {
     );
   }
 
+  Widget _buildTimePicker(){
+    return Padding(
+      padding: const EdgeInsets.all(15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            alignment: Alignment.centerLeft,
+            decoration: kBoxDecorationStyle,
+            height: 40.0,
+            child: TextField(
+              onTap: (){
+
+              },
+              style: TextStyle(
+                color: Style.standardTextColor,
+                fontFamily: 'OpenSans',
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.only(top: 8.0),
+                prefixIcon: Icon(
+                  Icons.event_note_outlined,
+                  color: Style.titleColor,
+                ),
+                hintText: 'Input event name',
+                hintStyle: kHintTextStyle,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   showDialog(
       context: context,
       builder: (context) {
@@ -82,7 +118,7 @@ void addEventWidget(BuildContext context) {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Add friend",
+                "Add Event",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Style.mainColor
