@@ -1,18 +1,20 @@
 
 
 class PlaceModel{
-  int placeId;
+  String placeId;
   String name;
-  String price;
-  String dressCode;
+  String cuisine;
+  String alcohol;
   String smokingArea;
+  String parkingLot;
   PlaceModel();
 
 
   PlaceModel.fromJson(var data):
         placeId = data['placeID'],
         name = data['name'],
-        price = data['price'],
-        dressCode = data['dress_code'],
+        cuisine = data['cuisine'],
+        alcohol = data['alcohol'],
+        parkingLot = data['parking_lot'],
         smokingArea = data['smoking_area'];
 }

@@ -103,7 +103,7 @@ final kAppBarEnableTextStyle = TextStyle(
 final kDataTextStyle = TextStyle(
   color: Style.standardTextColor,
   //
-  fontSize: 16,
+  fontSize: 18,
   fontFamily: 'OpenSans',
 );
 

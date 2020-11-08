@@ -14,6 +14,33 @@ class AppRepository {
   static String getCurrentEventUrl = "event/";
   final Dio _dio = Dio();
 
+  Future<EventResponse> addUserToEvent(String token,String userName,String eventId) async {
+
+    if(userName == ""){
+      return EventResponse.withError("Input name");
+    }
+    print("addUserToEvent");
+    var body = {
+      "users": ["$userName"],
+    };
+    var header = {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    };
+    try {
+      Response response = await _dio.post(mainUrl+getCurrentEventUrl+eventId+"/add", data: jsonEncode(body),options: Options(
+        headers: header,
+      ),);
+      //var data = jsonDecode(response.data);
+      print(response.data);
+      //print(jsonEncode(data));
+      return EventResponse.fromJson(response.data);
+    } catch (error, stacktrace) {
+      print("Exception occured: $error stackTrace: $stacktrace");
+      return EventResponse.withError("Нет сети");
+    }
+  }
 
   Future<EventResponse> getCurrentEvent(String token,int id) async {
     if(token=="0"){

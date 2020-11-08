@@ -8,6 +8,7 @@ import 'package:coffe_searcher_app/model/place_model.dart';
 import 'package:coffe_searcher_app/style/style.dart';
 import 'package:coffe_searcher_app/widgets/add_friends_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class EventItemScreen extends StatefulWidget {
   @override
@@ -15,14 +16,14 @@ class EventItemScreen extends StatefulWidget {
 }
 
 class _EventItemScreenState extends State<EventItemScreen> {
-  List<PlaceModel> places = [
+  /*List<PlaceModel> places = [
     PlaceModel(),
     PlaceModel(),
     PlaceModel(),
     PlaceModel(),
     PlaceModel(),
     PlaceModel(),
-  ];
+  ];*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,8 +91,11 @@ class _EventItemScreenState extends State<EventItemScreen> {
                         color: Style.mainColor,
                       ),
                       onPressed: () {
-                        getCurrentEventBloc.getCurrentEvent("0", snapshot.data.eventModel.id);
-                        getCurrentEventBloc.getCurrentEvent(authBloc.subject.value.user.token, snapshot.data.eventModel.id);
+                        getCurrentEventBloc.getCurrentEvent(
+                            "0", snapshot.data.eventModel.id);
+                        getCurrentEventBloc.getCurrentEvent(
+                            authBloc.subject.value.user.token,
+                            snapshot.data.eventModel.id);
                       },
                     ),
                   ],
@@ -131,9 +135,10 @@ class _EventItemScreenState extends State<EventItemScreen> {
                     if (index == 0) {
                       return _buildHeaderPlaceList();
                     } else {
-                      return _buildPredictPlaceItem(places[index - 1]);
+                      return _buildPredictPlaceItem(
+                          snapshot.data.eventModel.places[index - 1]);
                     }
-                  }, childCount: places.length),
+                  }, childCount: snapshot.data.eventModel.places.length),
                 )
               ]);
             } else {
@@ -195,7 +200,7 @@ class _EventItemScreenState extends State<EventItemScreen> {
           ),
         ),
         child: Container(
-          height: 110,
+          height: 140,
           decoration: kListItemBoxDecorationStyle,
           child: Row(
             children: [
@@ -203,7 +208,7 @@ class _EventItemScreenState extends State<EventItemScreen> {
                 flex: 5,
                 child: Container(
                   width: 110,
-                  height: 110,
+                  height: 140,
                   child: ClipRRect(
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(25),
@@ -221,7 +226,7 @@ class _EventItemScreenState extends State<EventItemScreen> {
               Expanded(
                 flex: 9,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 16.0, right: 16),
+                  padding: const EdgeInsets.only(top: 8.0, right: 8),
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: Column(
@@ -229,7 +234,7 @@ class _EventItemScreenState extends State<EventItemScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Iskander Lacksheri Rest",
+                          placeModel.name,
                           textAlign: TextAlign.start,
                           style: TextStyle(
                             fontSize: 20,
@@ -238,51 +243,111 @@ class _EventItemScreenState extends State<EventItemScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 4,
+                          height: 3,
                         ),
-                        Text(
-                          "pole1",
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Style.titleColor,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              "Cuisine: ",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Style.standardTextColor,
+                              ),
+                            ),
+                            Text(
+                              "${placeModel.cuisine}",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Style.titleColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              "Smoking Area: ",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Style.standardTextColor,
+                              ),
+                            ),
+                            Text(
+                              "${placeModel.smokingArea}",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Style.titleColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              "Alcohol: ",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Style.standardTextColor,
+                              ),
+                            ),
+                            Text(
+                              "${placeModel.alcohol}",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Style.titleColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 3,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              "Parking lot: ",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Style.standardTextColor,
+                              ),
+                            ),
+                            Text(
+                              "${placeModel.parkingLot}",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Style.titleColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-              SizedBox(
-                width: 8,
-              ),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  height: 110,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(25),
-                        bottomRight: Radius.circular(25)),
-                    child: RotatedBox(
-                      quarterTurns: -1,
-                      child: Container(
-                        color: Style.mainColor,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "",
-                            style:
-                                TextStyle(color: Style.mainColor, fontSize: 17),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+
             ],
           ),
         ),
@@ -300,20 +365,20 @@ class MySliverAppBar extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-
       child: Stack(
         fit: StackFit.expand,
         overflow: Overflow.visible,
         children: [
           Positioned(
-            top: -shrinkOffset-10,
+            top: -shrinkOffset - 10,
             left: MediaQuery.of(context).size.width / 6,
             child: Opacity(
               opacity: (1 - shrinkOffset / expandedHeight),
               child: Card(
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25),bottomRight: Radius.circular(25))
-                ),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25))),
                 borderOnForeground: true,
                 elevation: 5,
                 child: SizedBox(
@@ -330,15 +395,14 @@ class MySliverAppBar extends SliverPersistentHeaderDelegate {
                             return Container();
                           }
 
-                         return Container(
-                           child: Align(
-                             alignment: Alignment.center,
-                             child: Text(
-                               "${snapshot.data.eventModel.users.length}"
-                             ),
-                           ),
-                           );
-                        }else{
+                          return Container(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                  "${snapshot.data.eventModel.users.length}"),
+                            ),
+                          );
+                        } else {
                           return Container();
                         }
                       }),

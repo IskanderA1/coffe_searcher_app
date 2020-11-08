@@ -15,6 +15,12 @@ class GetCurrentEventBloc{
     EventResponse response = await _repository.getCurrentEvent(token, idEvent);
     _subject.sink.add(response);
   }
+  addUserToEvent(String token,String userName,String idEvent) async{
+    EventResponse response = await _repository.addUserToEvent( token, userName, idEvent);
+    if(response.error.isEmpty){
+      _subject.sink.add(response);
+    }
+  }
 
   BehaviorSubject<EventResponse> get subject => _subject;
   dispose(){

@@ -1,6 +1,7 @@
 import 'package:coffe_searcher_app/bloc/bottom_navbar_bloc.dart';
 import 'package:coffe_searcher_app/screens/tabs/events_screen.dart';
 import 'package:coffe_searcher_app/screens/tabs/home_search_search.dart';
+import 'package:coffe_searcher_app/screens/tabs/profile_screen.dart';
 import 'package:coffe_searcher_app/style/style.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,10 +44,9 @@ class _MainScreenState extends State<MainScreen> {
                 return HomeSearchScreen();
               case NavBarItem.EVENTS:
                 return EventsScreen();
-              case NavBarItem.FRENDS:
-                return testScreen();
               case NavBarItem.PROFILE:
-                return testScreen();
+                return ProfileScreen();
+
             }
           },
         ),

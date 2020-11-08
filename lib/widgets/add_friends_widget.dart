@@ -1,3 +1,5 @@
+import 'package:coffe_searcher_app/bloc/auth_user_bloc.dart';
+import 'package:coffe_searcher_app/bloc/get_curr_event_bloc.dart';
 import 'package:coffe_searcher_app/model/event_model.dart';
 import 'package:coffe_searcher_app/style/style.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 
 
 void addFriendsWidget(BuildContext context, EventModel eventModel) {
+  final _controller = TextEditingController();
 
   Widget _buildUserAddFriendTextField() {
     return Padding(
@@ -18,6 +21,7 @@ void addFriendsWidget(BuildContext context, EventModel eventModel) {
             decoration: kBoxDecorationStyle,
             height: 40.0,
             child: TextField(
+              controller: _controller,
               style: TextStyle(
                 color: Style.standardTextColor,
                 fontFamily: 'OpenSans',
@@ -51,6 +55,10 @@ void addFriendsWidget(BuildContext context, EventModel eventModel) {
               ),
               color: Style.titleColor,
               onPressed: () {
+                getCurrentEventBloc.addUserToEvent(authBloc.subject.value.user.token, _controller.text,
+                getCurrentEventBloc.subject.value.eventModel.id.toString());
+                _controller.clear();
+                Navigator.pop(context);
               },
               child: Text(
                 'Add',
