@@ -68,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: Colors.red,
                                 ),
                                 Text(
-                                  "Выйти",
+                                  "Log out",
                                   style: kExitStyleText,
                                 ),
                               ],

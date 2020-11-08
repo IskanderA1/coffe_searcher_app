@@ -132,8 +132,16 @@ class _EventItemScreenState extends State<EventItemScreen> {
                       // ignore: missing_return
                       SliverChildBuilderDelegate(
                           (BuildContext context, int index) {
+                            if(snapshot.data.eventModel.isComplete!=null){
+                              return Column(
+                                children: [
+                                  _buildHeaderPlaceList("Result: "),
+                                  _buildResultPlaceItem(snapshot.data.eventModel.places[0]),
+                                ],
+                              );
+                            }
                     if (index == 0) {
-                      return _buildHeaderPlaceList();
+                      return _buildHeaderPlaceList("Choice place");
                     } else {
                       return _buildPredictPlaceItem(
                           snapshot.data.eventModel.places[index - 1]);
@@ -148,12 +156,12 @@ class _EventItemScreenState extends State<EventItemScreen> {
     );
   }
 
-  Widget _buildHeaderPlaceList() {
+  Widget _buildHeaderPlaceList(String header) {
     return Padding(
       padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
       child: Container(
         child: Text(
-          "Choice place",
+          header,
           style: TextStyle(
               fontFamily: "HelveticaNeueBold.ttf",
               color: Style.standardTextColor,
@@ -169,6 +177,25 @@ class _EventItemScreenState extends State<EventItemScreen> {
       padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
       child: Dismissible(
         key: Key(placeModel.placeId.toString()),
+        onDismissed: (DismissDirection direction) async {
+          if (direction == DismissDirection.startToEnd) {
+            print("right");
+            getCurrentEventBloc.setVote(authBloc.subject.value.user.token, "1", getCurrentEventBloc.subject.value.eventModel.id.toString(), placeModel.placeId);
+            getCurrentEventBloc.getCurrentEvent(
+                "0", getCurrentEventBloc.subject.value.eventModel.id);
+            getCurrentEventBloc.getCurrentEvent(
+                authBloc.subject.value.user.token,
+                getCurrentEventBloc.subject.value.eventModel.id);
+          } else {
+            print('left');
+            getCurrentEventBloc.setVote(authBloc.subject.value.user.token, "-1", getCurrentEventBloc.subject.value.eventModel.id.toString(), placeModel.placeId);
+            getCurrentEventBloc.getCurrentEvent(
+                "0", getCurrentEventBloc.subject.value.eventModel.id);
+            getCurrentEventBloc.getCurrentEvent(
+                authBloc.subject.value.user.token,
+                getCurrentEventBloc.subject.value.eventModel.id);
+          }
+        },
         background: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -347,9 +374,166 @@ class _EventItemScreenState extends State<EventItemScreen> {
                   ),
                 ),
               ),
-
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildResultPlaceItem(PlaceModel placeModel) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
+      child: Container(
+        height: 140,
+        decoration: kListItemBoxDecorationStyle,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 5,
+              child: Container(
+                width: 110,
+                height: 140,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      bottomLeft: Radius.circular(25)),
+                  child: Image.network(
+                    "https://www.archrevue.ru/images/tb/2/6/4/26496/14507023686857_w1500h1500.jpg",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 8,
+            ),
+            Expanded(
+              flex: 9,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8.0, right: 8),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        placeModel.name,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Style.standardTextColor,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Cuisine: ",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.standardTextColor,
+                            ),
+                          ),
+                          Text(
+                            "${placeModel.cuisine}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.titleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Smoking Area: ",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.standardTextColor,
+                            ),
+                          ),
+                          Text(
+                            "${placeModel.smokingArea}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.titleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Alcohol: ",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.standardTextColor,
+                            ),
+                          ),
+                          Text(
+                            "${placeModel.alcohol}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.titleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Parking lot: ",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.standardTextColor,
+                            ),
+                          ),
+                          Text(
+                            "${placeModel.parkingLot}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.titleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

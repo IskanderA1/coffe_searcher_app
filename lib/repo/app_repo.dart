@@ -13,9 +13,36 @@ class AppRepository {
   static String eventsUrl = "users/get_all_events";
   static String createEventUrl = "even/create";
   static String getCurrentEventUrl = "event/";
+  static String setVoteEventUrl = "ranking/votes";
+
   final Dio _dio = Dio();
 
+  Future<EventResponse> setVote(String token,String vote,String eventID,String placeID) async {
 
+    print("setVote");
+    var body = {
+      "vote": "$vote",
+      "eventID": "$eventID",
+      "placeID":"$placeID"
+    };
+    var header = {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    };
+    try {
+      Response response = await _dio.post(mainUrl+setVoteEventUrl, data: jsonEncode(body),options: Options(
+        headers: header,
+      ),);
+      //var data = jsonDecode(response.data);
+      print(response.data);
+      //print(jsonEncode(data));
+      return EventResponse.fromJson(response.data);
+    } catch (error, stacktrace) {
+      print("Exception occured: $error stackTrace: $stacktrace");
+      return EventResponse.withError("Нет сети");
+    }
+  }
 
   Future<PlaceResponse> searchPlace(String token,String restName) async {
 

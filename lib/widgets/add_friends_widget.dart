@@ -54,9 +54,15 @@ void addFriendsWidget(BuildContext context, EventModel eventModel) {
                 borderRadius: BorderRadius.circular(50.0),
               ),
               color: Style.titleColor,
-              onPressed: () {
-                getCurrentEventBloc.addUserToEvent(authBloc.subject.value.user.token, _controller.text,
+              onPressed: () async {
+                await getCurrentEventBloc.addUserToEvent(authBloc.subject.value.user.token, _controller.text,
                 getCurrentEventBloc.subject.value.eventModel.id.toString());
+                getCurrentEventBloc.getCurrentEvent(
+                    "0", getCurrentEventBloc.subject.value.eventModel.id);
+                getCurrentEventBloc.getCurrentEvent(
+                    authBloc.subject.value.user.token,
+                    getCurrentEventBloc.subject.value.eventModel.id);
+
                 _controller.clear();
                 Navigator.pop(context);
               },
