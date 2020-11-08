@@ -110,7 +110,7 @@ class AppRepository {
         headers: header,
       ),);
       //var data = jsonDecode(response.data);
-      print(response.data);
+      print("preds=" + (response.data["preds"] as List).length.toString());
       //print(jsonEncode(data));
       return EventResponse.fromJson(response.data);
     } catch (error, stacktrace) {

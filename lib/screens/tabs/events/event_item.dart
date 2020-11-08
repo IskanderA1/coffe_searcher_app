@@ -140,12 +140,15 @@ class _EventItemScreenState extends State<EventItemScreen> {
                                 ],
                               );
                             }
-                    if (index == 0) {
-                      return _buildHeaderPlaceList("Choice place");
-                    } else {
-                      return _buildPredictPlaceItem(
-                          snapshot.data.eventModel.places[index - 1]);
-                    }
+
+                      return Column(
+                        children: [
+                          index==0?_buildHeaderPlaceList("Choice: "):Container(),
+                          _buildPredictPlaceItem(
+                              snapshot.data.eventModel.places[index]),
+                        ],
+                      );
+
                   }, childCount: snapshot.data.eventModel.places.length),
                 )
               ]);
