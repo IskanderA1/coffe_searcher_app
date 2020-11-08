@@ -1,4 +1,7 @@
 
+import 'package:coffe_searcher_app/bloc/auth_user_bloc.dart';
+import 'package:coffe_searcher_app/bloc/get_curr_event_bloc.dart';
+import 'package:coffe_searcher_app/bloc/get_events_bloc.dart';
 import 'package:coffe_searcher_app/style/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +10,8 @@ import 'package:flutter/material.dart';
 
 void addEventWidget(BuildContext context) {
 
-  Widget _buildUserAddFriendTextField() {
+  final _controllerAddEvents = TextEditingController();
+  Widget _buildAddEventsTextField() {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -18,6 +22,7 @@ void addEventWidget(BuildContext context) {
             decoration: kBoxDecorationStyle,
             height: 40.0,
             child: TextField(
+              controller: _controllerAddEvents,
               style: TextStyle(
                 color: Style.standardTextColor,
                 fontFamily: 'OpenSans',
@@ -38,7 +43,7 @@ void addEventWidget(BuildContext context) {
       ),
     );
   }
-  Widget _buildAdFriendsAlertButton() {
+  Widget _buildAddEventsAlertButton() {
     return Padding(
       padding: const EdgeInsets.only(left: 15,right: 15),
       child: Column(
@@ -50,7 +55,12 @@ void addEventWidget(BuildContext context) {
                 borderRadius: BorderRadius.circular(50.0),
               ),
               color: Style.titleColor,
-              onPressed: () {
+              onPressed: () async {
+                await getCurrentEventBloc.addEvent(authBloc.subject.value.user.token, _controllerAddEvents.text);
+                getEventsBloc.getEvents("0");
+                getEventsBloc.getEvents(authBloc.subject.value.user.token);
+                Navigator.pop(context);
+                _controllerAddEvents.clear();
               },
               child: Text(
                 'Add',
@@ -80,9 +90,6 @@ void addEventWidget(BuildContext context) {
             decoration: kBoxDecorationStyle,
             height: 40.0,
             child: TextField(
-              onTap: (){
-
-              },
               style: TextStyle(
                 color: Style.standardTextColor,
                 fontFamily: 'OpenSans',
@@ -127,8 +134,8 @@ void addEventWidget(BuildContext context) {
             ),
           ),
           children: <Widget>[
-            _buildUserAddFriendTextField(),
-            _buildAdFriendsAlertButton(),
+            _buildAddEventsTextField(),
+            _buildAddEventsAlertButton(),
           ],
         );
       });

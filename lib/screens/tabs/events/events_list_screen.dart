@@ -1,5 +1,6 @@
 import 'package:coffe_searcher_app/bloc/auth_user_bloc.dart';
 import 'package:coffe_searcher_app/bloc/events_bloc.dart';
+import 'package:coffe_searcher_app/bloc/get_curr_event_bloc.dart';
 import 'package:coffe_searcher_app/bloc/get_events_bloc.dart';
 import 'package:coffe_searcher_app/elements/loader.dart';
 import 'package:coffe_searcher_app/model/event_model.dart';
@@ -25,6 +26,18 @@ class _EventsListScreenState extends State<EventsListScreen> {
     return Scaffold(
       backgroundColor: Style.mainColor,
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.refresh,
+              color: Style.standardTextColor,
+            ),
+            onPressed: () {
+              getEventsBloc.getEvents("0");
+              getEventsBloc.getEvents(authBloc.subject.value.user.token);
+            },
+          ),
+        ],
         toolbarHeight: 80,
         title: Text(
           "Events",
@@ -67,6 +80,9 @@ class _EventsListScreenState extends State<EventsListScreen> {
         builder: (context, AsyncSnapshot<EventsResponse> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.error != null && snapshot.data.error.length > 0) {
+              if(snapshot.data.error == "loading"){
+                return buildLoadingWidget();
+              }
               return Container();
             }
             return ListView.builder(
@@ -175,6 +191,8 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     quarterTurns: -1,
                     child: GestureDetector(
                       onTap: () {
+                        getCurrentEventBloc.getCurrentEvent("0", eventModel.id);
+                        getCurrentEventBloc.getCurrentEvent(authBloc.subject.value.user.token, eventModel.id);
                         getEventsState.pickItem(1);
                       },
                       child: Container(

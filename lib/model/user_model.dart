@@ -8,5 +8,6 @@ class UserModel{
 
   UserModel();
   UserModel.fromJson(var data):
-        token = data["access_token"];
+        token = data["access_token"],
+        login = data['user']['username'];
 }

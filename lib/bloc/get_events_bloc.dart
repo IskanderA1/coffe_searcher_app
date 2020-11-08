@@ -13,7 +13,9 @@ class GetEventsBloc{
     EventsResponse response = await _repository.getEvents(token);
     _subject.sink.add(response);
   }
+  addEvent(String nameEvent,String token){
 
+  }
   dispose() {
     _subject.close();
   }

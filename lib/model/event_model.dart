@@ -1,4 +1,6 @@
 
+import 'package:coffe_searcher_app/model/place_model.dart';
+
 class EventModel{
   int id;
   String date;
@@ -6,13 +8,15 @@ class EventModel{
   String owner;
   String title;
   List<String> users;
+  List<PlaceModel> places;
 
   EventModel();
   EventModel.fromJson(var data):
-        id = data["eventId.id"],
-        date = data["eventId.date"],
-        description = data["eventId.description"],
-        owner = data["eventId.owner"],
-        title = data["eventId.title"],
-        users = (data["users"] as List).map((i) => i as String).toList();
+        id = data["id"],
+        date = data["date"],
+        description = data["description"],
+        owner = data["owner"],
+        title = data["title"],
+        users = data["users"]!=null?(data["users"] as List).map((i) => i.toString()).toList():List(),
+        places = data["preds"]!=null?(data["preds"] as List).map((i) => PlaceModel.fromJson(i)).toList():List();
 }

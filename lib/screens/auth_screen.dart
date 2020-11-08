@@ -14,8 +14,6 @@ class _AuthScreenState extends State<AuthScreen> {
   final loginController = TextEditingController();
   final passController = TextEditingController();
 
-
-
   @override
   void initState() {
     super.initState();

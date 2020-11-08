@@ -1,6 +1,9 @@
-
+import 'package:coffe_searcher_app/bloc/auth_user_bloc.dart';
 import 'package:coffe_searcher_app/bloc/events_bloc.dart';
+import 'package:coffe_searcher_app/bloc/get_curr_event_bloc.dart';
+import 'package:coffe_searcher_app/elements/loader.dart';
 import 'package:coffe_searcher_app/model/event_model.dart';
+import 'package:coffe_searcher_app/model/event_response.dart';
 import 'package:coffe_searcher_app/model/place_model.dart';
 import 'package:coffe_searcher_app/style/style.dart';
 import 'package:coffe_searcher_app/widgets/add_friends_widget.dart';
@@ -23,71 +26,120 @@ class _EventItemScreenState extends State<EventItemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          addFriendsWidget(context, EventModel());
-        },
-        backgroundColor: Style.titleColor,
-        label: Text(
-          "add friends",
-          style: TextStyle(
-            color: Style.mainColor,
-          ),
-        ),
-        icon: Icon(
-          Icons.add,
-          color: Style.mainColor,
-        ),
-      ),
-      body: CustomScrollView(slivers: [
-        SliverAppBar(
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: Style.mainColor,
-            ),
-            onPressed: () {
-              getEventsState.goHome();
-            },
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(25),
-                bottomRight: Radius.circular(25)),
-          ),
-          floating: false,
-          pinned: true,
-          toolbarHeight: 80,
-          expandedHeight: 240.0,
-          backgroundColor: Style.titleColor,
-          elevation: 0,
-          flexibleSpace: FlexibleSpaceBar(
-            centerTitle: true,
-            //titlePadding: EdgeInsets.all(8),
-            title: Text(
-              "Bob's Birthday",
-              style: TextStyle(
-                  fontFamily: "HelveticaNeueBold.ttf",
-                  color: Style.mainColor,
-                  fontSize: 34,
-                  fontWeight: FontWeight.bold),
-            ),
-
-          ),
-        ),
-        SliverList(
-          delegate:
-              // ignore: missing_return
-              SliverChildBuilderDelegate((BuildContext context, int index) {
-                if(index == 0){
-                 return _buildHeaderPlaceList();
-                }else{
-                  return _buildPredictPlaceItem(places[index-1]);
+      floatingActionButton: StreamBuilder(
+          stream: getCurrentEventBloc.subject,
+          // ignore: missing_return
+          builder:
+              (BuildContext context, AsyncSnapshot<EventResponse> snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data.error != null &&
+                  snapshot.data.error.length > 0) {
+                return Container();
+              }
+              return snapshot.data.eventModel.owner ==
+                      authBloc.subject.value.user.login
+                  ? FloatingActionButton.extended(
+                      onPressed: () {
+                        addFriendsWidget(context, EventModel());
+                      },
+                      backgroundColor: Style.titleColor,
+                      label: Text(
+                        "add friends",
+                        style: TextStyle(
+                          color: Style.mainColor,
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.add,
+                        color: Style.mainColor,
+                      ),
+                    )
+                  : Container();
+            } else {
+              return Container();
+            }
+          }),
+      body: StreamBuilder(
+          stream: getCurrentEventBloc.subject,
+          builder:
+              (BuildContext context, AsyncSnapshot<EventResponse> snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data.error != null &&
+                  snapshot.data.error.length > 0) {
+                if (snapshot.data.error == "loading") {
+                  return buildLoadingWidget();
                 }
-
-          }, childCount: places.length),
-        )
-      ]),
+                print("AuthScreen");
+                return Container();
+              }
+              return CustomScrollView(slivers: [
+                SliverAppBar(
+                  leading: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Style.mainColor,
+                    ),
+                    onPressed: () {
+                      getEventsState.goHome();
+                    },
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.refresh,
+                        color: Style.mainColor,
+                      ),
+                      onPressed: () {
+                        getCurrentEventBloc.getCurrentEvent("0", snapshot.data.eventModel.id);
+                        getCurrentEventBloc.getCurrentEvent(authBloc.subject.value.user.token, snapshot.data.eventModel.id);
+                      },
+                    ),
+                  ],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25)),
+                  ),
+                  floating: false,
+                  pinned: true,
+                  toolbarHeight: 80,
+                  expandedHeight: 240.0,
+                  backgroundColor: Style.titleColor,
+                  elevation: 0,
+                  flexibleSpace: FlexibleSpaceBar(
+                    centerTitle: true,
+                    //titlePadding: EdgeInsets.all(8),
+                    title: Text(
+                      snapshot.data.eventModel.title,
+                      style: TextStyle(
+                          fontFamily: "HelveticaNeueBold.ttf",
+                          color: Style.mainColor,
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                SliverPersistentHeader(
+                  delegate: MySliverAppBar(expandedHeight: 50),
+                  pinned: true,
+                ),
+                SliverList(
+                  delegate:
+                      // ignore: missing_return
+                      SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                    if (index == 0) {
+                      return _buildHeaderPlaceList();
+                    } else {
+                      return _buildPredictPlaceItem(places[index - 1]);
+                    }
+                  }, childCount: places.length),
+                )
+              ]);
+            } else {
+              return buildLoadingWidget();
+            }
+          }),
     );
   }
 
@@ -114,20 +166,16 @@ class _EventItemScreenState extends State<EventItemScreen> {
         key: Key(placeModel.placeId.toString()),
         background: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.centerRight,
-                end: Alignment.centerLeft,
-                colors: [
-                  Style.mainColor,
-                  Style.titleColor,
-                  Style.mainColor
-                ],
-                tileMode: TileMode.mirror
-            )
-          ),
+              gradient: LinearGradient(
+                  begin: Alignment.centerRight,
+                  end: Alignment.centerLeft,
+                  colors: [Style.mainColor, Style.titleColor, Style.mainColor],
+                  tileMode: TileMode.mirror)),
           child: Align(
-            child: Icon(Icons.check_circle,
-              color: Style.mainColor,),
+            child: Icon(
+              Icons.check_circle,
+              color: Style.mainColor,
+            ),
           ),
         ),
         secondaryBackground: Container(
@@ -140,11 +188,11 @@ class _EventItemScreenState extends State<EventItemScreen> {
                     Colors.red,
                     Style.mainColor,
                   ],
-                  tileMode: TileMode.mirror
-              )
+                  tileMode: TileMode.mirror)),
+          child: Icon(
+            Icons.cancel,
+            color: Style.mainColor,
           ),
-          child: Icon(Icons.cancel,
-          color: Style.mainColor,),
         ),
         child: Container(
           height: 110,
@@ -241,4 +289,74 @@ class _EventItemScreenState extends State<EventItemScreen> {
       ),
     );
   }
+}
+
+class MySliverAppBar extends SliverPersistentHeaderDelegate {
+  final double expandedHeight;
+
+  MySliverAppBar({@required this.expandedHeight});
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+
+      child: Stack(
+        fit: StackFit.expand,
+        overflow: Overflow.visible,
+        children: [
+          Positioned(
+            top: -shrinkOffset-10,
+            left: MediaQuery.of(context).size.width / 6,
+            child: Opacity(
+              opacity: (1 - shrinkOffset / expandedHeight),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25),bottomRight: Radius.circular(25))
+                ),
+                borderOnForeground: true,
+                elevation: 5,
+                child: SizedBox(
+                  height: expandedHeight,
+                  width: MediaQuery.of(context).size.width / 1.5,
+                  child: StreamBuilder(
+                      stream: getCurrentEventBloc.subject,
+                      // ignore: missing_return
+                      builder: (BuildContext context,
+                          AsyncSnapshot<EventResponse> snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data.error != null &&
+                              snapshot.data.error.length > 0) {
+                            return Container();
+                          }
+
+                         return Container(
+                           child: Align(
+                             alignment: Alignment.center,
+                             child: Text(
+                               "${snapshot.data.eventModel.users.length}"
+                             ),
+                           ),
+                           );
+                        }else{
+                          return Container();
+                        }
+                      }),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => expandedHeight;
+
+  @override
+  double get minExtent => 0;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
 }

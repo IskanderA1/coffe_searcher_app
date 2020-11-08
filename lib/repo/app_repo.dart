@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:coffe_searcher_app/model/event_response.dart';
 import 'package:coffe_searcher_app/model/events_response.dart';
 import 'package:coffe_searcher_app/model/user_response.dart';
 import 'package:dio/dio.dart';
@@ -7,14 +10,73 @@ class AppRepository {
   static String mainUrl = "https://ameaty.herokuapp.com/";
   static String loginUrl = "token";
   static String eventsUrl = "users/get_all_events";
+  static String createEventUrl = "even/create";
+  static String getCurrentEventUrl = "event/";
   final Dio _dio = Dio();
 
 
+  Future<EventResponse> getCurrentEvent(String token,int id) async {
+    if(token=="0"){
+      return EventResponse.withError("loading");
+    }
+    print("getCurrentEvent");
+    var body = {
+    };
+    var header = {
+      "accept": "application/json",
+      "Authorization": "Bearer $token"
+    };
+    try {
+      Response response = await _dio.get(mainUrl+getCurrentEventUrl+id.toString(),options: Options(
+        headers: header,
+      ),);
+      //var data = jsonDecode(response.data);
+      print(response.data);
+      //print(jsonEncode(data));
+      return EventResponse.fromJson(response.data);
+    } catch (error, stacktrace) {
+      print("Exception occured: $error stackTrace: $stacktrace");
+      return EventResponse.withError("Нет сети");
+    }
+  }
+
+
+  Future<EventResponse> addEvent(String token,String nameEvent) async {
+
+    if(nameEvent == ""){
+      return EventResponse.withError("Input name");
+    }
+    print("addEvent");
+    var body = {
+      "title": "$nameEvent",
+      "description": "$nameEvent",
+    };
+    var header = {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    };
+    try {
+      Response response = await _dio.post(mainUrl+createEventUrl, data: jsonEncode(body),options: Options(
+        headers: header,
+      ),);
+      //var data = jsonDecode(response.data);
+      print(response.data);
+      //print(jsonEncode(data));
+      return EventResponse.fromJson(response.data);
+    } catch (error, stacktrace) {
+      print("Exception occured: $error stackTrace: $stacktrace");
+      return EventResponse.withError("Нет сети");
+    }
+  }
 
   Future<EventsResponse> getEvents(String token) async {
+    if(token=="0"){
+      return EventsResponse.withError("loading");
+    }
     var body = {};
     var header = {
-      "Content-Type": "accept: application/json",
+      "Content-Type": "application/json",
       "Authorization": "Bearer $token"
     };
     try {
