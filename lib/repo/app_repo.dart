@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:coffe_searcher_app/model/event_response.dart';
 import 'package:coffe_searcher_app/model/events_response.dart';
+import 'package:coffe_searcher_app/model/place_response.dart';
 import 'package:coffe_searcher_app/model/user_response.dart';
 import 'package:dio/dio.dart';
 
@@ -13,6 +14,31 @@ class AppRepository {
   static String createEventUrl = "even/create";
   static String getCurrentEventUrl = "event/";
   final Dio _dio = Dio();
+
+
+
+  Future<PlaceResponse> searchPlace(String token,String restName) async {
+
+    print("searchPlace");
+    var header = {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    };
+    try {
+      Response response = await _dio.post(mainUrl+"rest/search?rest_name=$restName",options: Options(
+        headers: header,
+      ),);
+      //var data = jsonDecode(response.data);
+      print(response.data);
+      //print(jsonEncode(data));
+      return PlaceResponse.fromJson(response.data);
+    } catch (error, stacktrace) {
+      print("Exception occured: $error stackTrace: $stacktrace");
+      return PlaceResponse.withError("Нет сети");
+    }
+  }
+
 
   Future<EventResponse> addUserToEvent(String token,String userName,String eventId) async {
 
@@ -47,8 +73,7 @@ class AppRepository {
       return EventResponse.withError("loading");
     }
     print("getCurrentEvent");
-    var body = {
-    };
+
     var header = {
       "accept": "application/json",
       "Authorization": "Bearer $token"

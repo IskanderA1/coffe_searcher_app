@@ -1,10 +1,13 @@
 
-import 'package:coffe_searcher_app/model/event_model.dart';
+import 'package:coffe_searcher_app/bloc/auth_user_bloc.dart';
+import 'package:coffe_searcher_app/bloc/search_bloc.dart';
+
 import 'package:coffe_searcher_app/model/place_model.dart';
+import 'package:coffe_searcher_app/model/place_response.dart';
 import 'package:coffe_searcher_app/style/style.dart';
-import 'package:coffe_searcher_app/widgets/add_friends_widget.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+
 
 class HomeSearchScreen extends StatefulWidget {
   @override
@@ -13,9 +16,21 @@ class HomeSearchScreen extends StatefulWidget {
 
 class _HomeSearchScreenState extends State<HomeSearchScreen> {
   final _searchController = TextEditingController();
+
+
+  @override
+  void initState() {
+    _searchController.addListener(_onSearchChanged);
+    super.initState();
+  }
+
+  _onSearchChanged() {
+    searchBloc.searchPlace(authBloc.subject.value.user.token,_searchController.text);
+  }
   @override
   void dispose() {
     _searchController.dispose();
+    _searchController.removeListener(_onSearchChanged);
     super.dispose();
   }
 
@@ -44,14 +59,6 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
           children: [
             Container(
               child: _buildSearchTextField(),
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  _buildAddFriends(),
-                ],
-              ),
             ),
             Expanded(
                 flex: 5,
@@ -97,52 +104,35 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
     );
   }
 
-  Widget _buildAddFriends() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 15,right: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            child: RaisedButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50.0),
-              ),
-              color: Style.titleColor,
-              onPressed: () {
-                addFriendsWidget(context, EventModel());
-              },
-              child: Text(
-                'With Friends',
-                style: TextStyle(
-                  color: Colors.white,
-                  letterSpacing: 1.5,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'OpenSans',
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildResultsList() {
-    List<PlaceModel> places = [PlaceModel(), PlaceModel(), PlaceModel()];
-    return ListView.builder(
-        itemCount: places.length,
-        itemBuilder: (context, index) {
-          return _buildPlaceItem(places[index]);
-        });
-  }
 
+
+    return StreamBuilder(
+      stream: searchBloc.subject,
+      // ignore: missing_return
+      builder: (context,AsyncSnapshot<PlaceResponse> snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data.error != null &&
+              snapshot.data.error.length > 0) {
+            return Container();
+          }
+          return ListView.builder(
+              itemCount: snapshot.data.places.length,
+              itemBuilder: (context, index) {
+                return _buildPlaceItem(snapshot.data.places[index]);
+              });
+        }else{
+          return Container();
+        }
+      }
+    );
+  }
   Widget _buildPlaceItem(PlaceModel placeModel) {
     return Padding(
       padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
       child: Container(
-        height: 110,
+        height: 140,
         decoration: kListItemBoxDecorationStyle,
         child: Row(
           children: [
@@ -150,7 +140,7 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
               flex: 5,
               child: Container(
                 width: 110,
-                height: 110,
+                height: 140,
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(25),
@@ -168,7 +158,7 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
             Expanded(
               flex: 9,
               child: Padding(
-                padding: const EdgeInsets.only(top: 16.0, right: 16),
+                padding: const EdgeInsets.only(top: 8.0, right: 8),
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Column(
@@ -176,7 +166,7 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Iskander Lacksheri Rest",
+                        placeModel.name,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           fontSize: 20,
@@ -185,54 +175,115 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
                         ),
                       ),
                       SizedBox(
-                        height: 4,
+                        height: 3,
                       ),
-                      Text(
-                        "pole1",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Style.titleColor,
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            "Cuisine: ",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.standardTextColor,
+                            ),
+                          ),
+                          Text(
+                            "${placeModel.cuisine}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.titleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Smoking Area: ",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.standardTextColor,
+                            ),
+                          ),
+                          Text(
+                            "${placeModel.smokingArea}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.titleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Alcohol: ",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.standardTextColor,
+                            ),
+                          ),
+                          Text(
+                            "${placeModel.alcohol}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.titleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Parking lot: ",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.standardTextColor,
+                            ),
+                          ),
+                          Text(
+                            "${placeModel.parkingLot}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Style.titleColor,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            SizedBox(
-              width: 8,
-            ),
-            Expanded(
-              flex: 2,
-              child: Container(
-                height: 110,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(25),
-                      bottomRight: Radius.circular(25)),
-                  child: RotatedBox(
-                    quarterTurns: -1,
-                    child: Container(
-                      color: Style.titleColor,
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Go",
-                          style:
-                              TextStyle(color: Style.mainColor, fontSize: 17),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+
           ],
         ),
       ),
     );
   }
+
 }

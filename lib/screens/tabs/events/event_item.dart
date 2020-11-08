@@ -124,7 +124,7 @@ class _EventItemScreenState extends State<EventItemScreen> {
                   ),
                 ),
                 SliverPersistentHeader(
-                  delegate: MySliverAppBar(expandedHeight: 50),
+                  delegate: MySliverAppBar(expandedHeight: 70),
                   pinned: true,
                 ),
                 SliverList(
@@ -399,7 +399,14 @@ class MySliverAppBar extends SliverPersistentHeaderDelegate {
                             child: Align(
                               alignment: Alignment.center,
                               child: Text(
-                                  "${snapshot.data.eventModel.users.length}"),
+                                  "Team: ${snapshot.data.eventModel.users.toString().replaceAll("[", "").replaceAll("]", "")}",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Style.titleColor,
+                                ),
+                              ),
                             ),
                           );
                         } else {
